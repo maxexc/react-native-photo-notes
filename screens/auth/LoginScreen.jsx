@@ -20,7 +20,7 @@ const initialState = {
     password: '',
 }
 
-export const LoginScreen = () => {
+export const LoginScreen = ({ navigation }) => {
     const [state, setState] = useState(initialState)
     const [isKeyboardShown, setIsKeyboardShown] = useState(true);
     const [isSecureText, setIsSecureText] = useState(true);
@@ -126,11 +126,12 @@ export const LoginScreen = () => {
                                         <Text style={styles.submitBtnText}>SIGN IN</Text>
                                 </TouchableOpacity>
                                 
-                                <Pressable style={styles.linkToLoginPage} 
-                                // onPress={() => navigation.navigate('Registration')}
+                                <TouchableOpacity  
+                                    activeOpacity={0.6} 
+                                    onPress={() => navigation.navigate('Registration')}
                                 >
                                     <Text style={styles.linkToLoginPageText}>Don't have an account? Sign up</Text>
-                                </Pressable> 
+                                </TouchableOpacity> 
                                 <View style={styles.homeIndicator} /> 
                             </> ) : null } 
                         
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
         height: 5,
         width: 134,
         alignSelf: 'center',
-        bottom: 8,
+        bottom: 6,
         backgroundColor: '#212121',
         borderRadius: 100,
     },
@@ -229,6 +230,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     linkToLoginPageText: {
+        alignSelf: 'center',
         fontSize: 16,
         color: '#1B4371',
         lineHeight: 19,

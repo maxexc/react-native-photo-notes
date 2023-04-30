@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 // import {LogBox} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-// import { RegistrationScreen } from './screens/auth/RegistrationScreen';
-import { LoginScreen } from './screens/auth/LoginScreen';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { RegistrationScreen } from './screens/auth/RegistrationScreen';
+import {useRoute} from './router';
 
 const fonts = {
   "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
@@ -19,6 +18,9 @@ const fonts = {
 export default function App() {
   const [isReady, setIsReady] = useState(false);
   // LogBox.ignoreLogs(['Remote debugger']);
+  
+
+  const routing = useRoute(null)
 
   useEffect(() => {
     async function preloadFonts() {
@@ -40,11 +42,12 @@ export default function App() {
   }  
 
   return (
-    <View style={styles.container}>
-      <RegistrationScreen />
-      {/* <LoginScreen />      */}
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      {/* <View style={styles.container}> */}
+        {routing}
+        <StatusBar style="auto" />
+      {/* </View> */}
+    </NavigationContainer>      
   );
 }
 

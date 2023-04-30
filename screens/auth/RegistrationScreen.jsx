@@ -25,7 +25,8 @@ const initialState = {
     password: '',
 }
 
-export const RegistrationScreen = () => {
+export const RegistrationScreen = ({ navigation }) => {
+    // console.log('navigation:', navigation);
     // console.log(Platform.OS);
     const [state, setState] = useState(initialState)
     const [isKeyboardShown, setIsKeyboardShown] = useState(true);
@@ -97,20 +98,26 @@ export const RegistrationScreen = () => {
                         
                         {/* avatar   button add/delete avatar */}
                             <View style={styles.avatar}>
-                                <Image source={{ uri: avatar }} style={styles.avatarImg} />
+                                {Platform.OS === 'ios' ? 
+                                    avatar && (<Image source={{ cache: 'only-if-cached', uri: avatar }} style={styles.avatarImg} />) :
+                                    <Image source={{ cache: 'only-if-cached', uri: avatar }} style={styles.avatarImg} />}
                                 {avatar ? (
-                                <Pressable onPress={() => {setAvatar(null);}} >
-                                    <View style={styles.removeAvatarIcon}>
-                                        <AntDesign name="closecircleo" style={{transform: [{ rotate: '45deg' }]}} color="#BDBDBD" size={25} />
-                                    </View>
-                                </Pressable>
-                                ) : (
-                                <Pressable onPress={pickImage}>
-                                    <View style={styles.addAvatarIcon}>
-                                        <AntDesign name="pluscircleo" color="#FF6C00" size={25}/>
-                                    </View>
-                                </Pressable>
-                                )}
+                                        <TouchableOpacity activeOpacity={0.5} onPress={() => {setAvatar(null); }} >
+                                            <View style={styles.removeAvatarIcon}>
+                                                <View style={{ backgroundColor: '#fff', borderRadius: 50, }}>
+                                                    <AntDesign style={{ transform: [{ rotate: '45deg' }] }} name="closecircleo" color="#BDBDBD" size={25} />                                                    
+                                                </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                        ) : (
+                                        <TouchableOpacity activeOpacity={0.5} onPress={pickImage}>
+                                            <View style={styles.addAvatarIcon}>
+                                                <View style={{ backgroundColor: '#fff', borderRadius: 50, }}>
+                                                    <AntDesign name="pluscircleo" color="#FF6C00" size={25} />
+                                                </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                )}                                
                             </View>                            
 
                             {/* title & inputs */}
@@ -185,11 +192,12 @@ export const RegistrationScreen = () => {
                                         <Text style={styles.submitBtnText}>SIGN UP</Text>
                                 </TouchableOpacity>
                                 
-                                <Pressable style={styles.linkToLoginPage} 
-                                // onPress={() => navigation.navigate('Login')}
+                                <TouchableOpacity  
+                                    activeOpacity={0.6}
+                                    onPress={() => navigation.navigate('Login')}
                                 >
                                     <Text style={styles.linkToLoginPageText}>Already have an account, log in</Text>
-                                </Pressable> 
+                                </TouchableOpacity> 
                                 <View style={styles.homeIndicator} /> 
                             </> ) : null } 
                         
@@ -225,7 +233,7 @@ const styles = StyleSheet.create({
         width: '100%',
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
-        paddingHorizontal: 16,        
+        paddingHorizontal: 16,  
     },
     avatar: {
         position: 'absolute',
@@ -245,26 +253,24 @@ const styles = StyleSheet.create({
     },
     removeAvatarIcon: {
         // position: 'absolute',
+        padding: 10,
         transform: [{ rotate: '45deg' }],
-        right: 12.5,
-        bottom: 14,
-        backgroundColor: '#fff',
-        borderRadius: 50,        
+        right: 22.5,
+        bottom: 4,
     },
     addAvatarIcon: {
         // position: 'absolute',
+        padding: 10,
         color: "#FF6C00",
-        right: 12.5,
-        bottom: 14,
-        backgroundColor: '#fff',
-        borderRadius: 50,
+        right: Platform.OS === 'ios' ? -97 : 22.5,
+        bottom: 4,
     },
     homeIndicator: {
         position: 'absolute',
         height: 5,
         width: 134,
         alignSelf: 'center',
-        bottom: 8,
+        bottom: 6,
         backgroundColor: '#212121',
         borderRadius: 100,
     },
@@ -272,8 +278,8 @@ const styles = StyleSheet.create({
         fontSize: 30,
         lineHeight: 35,
         letterSpacing: 0.72,
-        marginTop: 92,
-        marginBottom: 32,
+        marginTop: 82,
+        marginBottom: 22,
         textAlign: 'center',
         color: '#212121',
         fontFamily: 'Roboto-Medium',
@@ -320,6 +326,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     linkToLoginPageText: {
+        alignSelf: 'center',
         fontSize: 16,
         color: '#1B4371',
         lineHeight: 19,
