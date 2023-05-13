@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { StyleSheet, View } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
@@ -12,15 +13,14 @@ import ProfileScreen from './screens/main/ProfileScreen';
 import { SimpleLineIcons } from '@expo/vector-icons'; 
 import { Feather } from '@expo/vector-icons'; 
 import { AntDesign } from '@expo/vector-icons';
-import { StyleSheet, View } from "react-native";
 
 
 
 const AuthStack = createStackNavigator();
 const MainTab = createBottomTabNavigator();
 
-export const useRoute = (isAuth) => {
-
+export const useRoute = (isAuth, ) => {
+    
     if (!isAuth) {
         return (
             <AuthStack.Navigator>
@@ -43,21 +43,25 @@ export const useRoute = (isAuth) => {
     return (
         <>
             <MainTab.Navigator
-                style={{tabBarStyle: 'none'}}
-                initialRouteName="Create"
+                style={{borderColor: '#fff',}}
+                initialRouteName="Posts"
+                name='Home'                
                 screenOptions={{
+                    // unmountOnBlur: true,
                     headerShown: false,
                     tabBarShowLabel: false,
                     tabBarActiveTintColor: '#FFFFFF',
                     tabBarInactiveTintColor: '#212121CC',
                     tabBarActiveBackgroundColor: "#FF6C00",
-                    tabBarItemStyle: { borderRadius: 20, height: 40 },
+                    tabBarItemStyle: { borderRadius: 20, height: 40, marginHorizontal: 10 },
                     tabBarStyle: {
                         paddingTop: 9,
                         height: 83,
-                        width: 272,
-                        alignSelf: 'center',
-                        shadowColor: '#fff',
+                        paddingHorizontal: 20,                        
+                        // width: 272,
+                        // alignSelf: 'center',
+                        // shadowColor: '#fff',
+                        // borderTopWidth: 0,
                         },
                 }}
             >
@@ -74,6 +78,7 @@ export const useRoute = (isAuth) => {
                 name='Create'
                 component={CreateScreen}
                 options={{
+                    unmountOnBlur: true,
                     tabBarIcon: ({ focused, size, color }) => (
                         <AntDesign name="plus" size={24} color={color} />
                     ),

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import * as ScreenOrientation from "expo-screen-orientation";
 import {
     StyleSheet,
     View,
@@ -13,6 +14,8 @@ import {
     TouchableWithoutFeedback,
     Dimensions,
 } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { onStateChange } from '../../redux/auth/authSlice';
 
 
 const initialState = {
@@ -27,11 +30,40 @@ export const LoginScreen = ({ navigation }) => {
     const [isActiveMail, setIsActiveMail] = useState(false);
     const [isActivePass, setIsActivePass] = useState(false);
 
-    const [widthDimensions, setWidthDimensions] = useState(
-        Dimensions.get('window').width - 20 * 2,
-    )   
+    const dispatch = useDispatch()
+    
+    // ----WARNING---- check orientation ----WARNING---- //    
+    const [orientation, setOrientation] = useState(null);
 
     useEffect(() => {
+        checkOrientation();
+        const subscription = ScreenOrientation.addOrientationChangeListener(
+        handleOrientationChange
+        );
+        return () => {
+        ScreenOrientation.removeOrientationChangeListeners(subscription);
+        };
+    }, []);
+    const checkOrientation = async () => {
+        const orientation = await ScreenOrientation.getOrientationAsync();
+        setOrientation(orientation);
+    };
+    const handleOrientationChange = (e) => {
+        setOrientation(e.orientationInfo.orientation);
+    };
+    // console.log(orientation);    
+    
+    const [widthDimensions, setWidthDimensions] = useState();   
+
+    useEffect(() => {
+        // ----WARNING---- check orientation ----WARNING---- //
+        
+        if (orientation !== 1) {
+            return setWidthDimensions((Dimensions.get('window').width) / 2);
+        } else setWidthDimensions((Dimensions.get('window').width) - 20 * 2);
+
+        // -------------------------------------------------- //
+
         const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
             setIsKeyboardShown(false);
         });
@@ -44,12 +76,13 @@ export const LoginScreen = ({ navigation }) => {
             showSubscription.remove();
             hideSubscription.remove();
         };
-    }, [isKeyboardShown]);
+    }, [isKeyboardShown, orientation]);
 
     const handleSubmit = () => {
         Keyboard.dismiss();
         // console.log(state);
-        console.log('email:', state.email, 'password:', state.password);
+        console.log('email:', state.email, 'password:', state.password); 
+        dispatch(onStateChange())
         // dispatch(authSignUpUser(state));
         setState(initialState);
     };
@@ -130,7 +163,9 @@ export const LoginScreen = ({ navigation }) => {
                                     activeOpacity={0.6} 
                                     onPress={() => navigation.navigate('Registration')}
                                 >
-                                    <Text style={styles.linkToLoginPageText}>Don't have an account? Sign up</Text>
+                                    <Text style={styles.linkToLoginPageText}>Don't have an account?
+                                        <Text style={{ fontFamily: 'Roboto-Bold' }}> Sign up</Text>
+                                    </Text>
                                 </TouchableOpacity> 
                                 <View style={styles.homeIndicator} /> 
                             </> ) : null } 
@@ -144,11 +179,6 @@ export const LoginScreen = ({ navigation }) => {
 }
 
 const styles = StyleSheet.create({
-    wrapper: {
-        flex: 1,
-        width: '100%',
-        backgroundColor: "#97c6f1",
-    },
     container: {
         flex: 1,
         width: '100%',
@@ -168,15 +198,6 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
         paddingHorizontal: 16,        
-    },   
-    homeIndicator: {
-        position: 'absolute',
-        height: 5,
-        width: 134,
-        alignSelf: 'center',
-        bottom: 6,
-        backgroundColor: '#212121',
-        borderRadius: 100,
     },
     title: {
         fontSize: 30,
@@ -226,14 +247,20 @@ const styles = StyleSheet.create({
         lineHeight: 19,
         fontFamily: "Roboto-Regular",
     },
-    linkToLoginPage: {
-        alignSelf: 'center',
-    },
     linkToLoginPageText: {
         alignSelf: 'center',
         fontSize: 16,
         color: '#1B4371',
         lineHeight: 19,
         fontFamily: "Roboto-Regular",
+    },   
+    homeIndicator: {
+        position: 'absolute',
+        height: 5,
+        width: 134,
+        alignSelf: 'center',
+        bottom: 6,
+        backgroundColor: '#212121',
+        borderRadius: 100,
     },
 })

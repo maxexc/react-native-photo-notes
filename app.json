@@ -6,6 +6,11 @@
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "plugins": [[
+        "expo-camera",
+        {"cameraPermission": "granted"
+        }
+    ]],
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",

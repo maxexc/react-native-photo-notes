@@ -6,6 +6,10 @@ import { StyleSheet, Text, View } from 'react-native';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import {useRoute} from './router';
+import { Provider } from 'react-redux';
+import Main from './components/main';
+import { store } from './redux/store';
+// import { useSelector } from 'react-redux';
 
 const fonts = {
   "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
@@ -18,9 +22,11 @@ const fonts = {
 export default function App() {
   const [isReady, setIsReady] = useState(false);
   // LogBox.ignoreLogs(['Remote debugger']);
+  // const {stateChange} = useSelector((state) => state.auth) ;
+  
   
 
-  const routing = useRoute(null)
+  const routing = useRoute({})
 
   useEffect(() => {
     async function preloadFonts() {
@@ -42,12 +48,15 @@ export default function App() {
   }  
 
   return (
-    <NavigationContainer>
-      {/* <View style={styles.container}> */}
-        {routing}
-        <StatusBar style="auto" />
-      {/* </View> */}
-    </NavigationContainer>      
+    <Provider store={store}>
+      <Main />
+    </Provider>
+    // <NavigationContainer>
+    //   {/* <View style={styles.container}> */}
+    //     {routing}
+    //     <StatusBar style="auto" />
+    //   {/* </View> */}
+    // </NavigationContainer>      
   );
 }
 

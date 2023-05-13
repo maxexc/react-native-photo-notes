@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import * as ScreenOrientation from "expo-screen-orientation";
 import * as ImagePicker from 'expo-image-picker';
 import {
     StyleSheet,
@@ -16,6 +17,10 @@ import {
     Image,
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import { onStateChange } from '../../redux/auth/authSlice';
+import { useDispatch } from 'react-redux';
+
+// console.log(ScreenOrientation);
 
 
 const initialState = {
@@ -36,11 +41,40 @@ export const RegistrationScreen = ({ navigation }) => {
     const [isActivePass, setIsActivePass] = useState(false);
     const [avatar, setAvatar] = useState(null);
 
-    const [widthDimensions, setWidthDimensions] = useState(
-        Dimensions.get('window').width - 20 * 2,
-    )   
+    const dispatch = useDispatch();
+   
+    // ----WARNING---- check orientation ----WARNING---- //    
+    const [orientation, setOrientation] = useState(null);
 
     useEffect(() => {
+        checkOrientation();    
+        const subscription = ScreenOrientation.addOrientationChangeListener(
+        handleOrientationChange
+        );
+        return () => {
+        ScreenOrientation.removeOrientationChangeListeners(subscription);
+        };        
+    }, []);
+    const checkOrientation = async () => {
+        const orientation = await ScreenOrientation.getOrientationAsync();
+        setOrientation(orientation);
+    };    
+    const handleOrientationChange = (e) => {
+        setOrientation(e.orientationInfo.orientation);
+    };    
+    // console.log(orientation); 
+
+    const [widthDimensions, setWidthDimensions] = useState();   
+
+    useEffect(() => {
+        // ----WARNING---- check orientation ----WARNING---- //
+        
+         if (orientation !== 1) {
+            return setWidthDimensions((Dimensions.get('window').width )/ 2)
+        } else setWidthDimensions((Dimensions.get('window').width) - 20 * 2)
+
+        // -------------------------------------------------- //
+
         const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
             setIsKeyboardShown(false);
         });
@@ -53,12 +87,13 @@ export const RegistrationScreen = ({ navigation }) => {
             showSubscription.remove();
             hideSubscription.remove();
         };
-    }, [isKeyboardShown]);
+    }, [isKeyboardShown, orientation]);
 
     const handleSubmit = () => {    
         Keyboard.dismiss();
         // console.log(state);
         console.log('login:', state.login, 'email:', state.email, 'password:', state.password);
+        dispatch(onStateChange())
         // dispatch(authSignUpUser(state));
         setState(initialState);
     };
@@ -92,7 +127,7 @@ export const RegistrationScreen = ({ navigation }) => {
                         <View
                             style={{
                                 ...styles.form,
-                                paddingBottom: isKeyboardShown ? 45 : 16,
+                                paddingBottom: isKeyboardShown ? 42 : 16,
                                 width: widthDimensions,
                         }}>
                         
@@ -196,7 +231,9 @@ export const RegistrationScreen = ({ navigation }) => {
                                     activeOpacity={0.6}
                                     onPress={() => navigation.navigate('Login')}
                                 >
-                                    <Text style={styles.linkToLoginPageText}>Already have an account, log in</Text>
+                                    <Text style={styles.linkToLoginPageText}>Already have an account, 
+                                        <Text style={{ fontFamily: 'Roboto-Bold'}}> Log in</Text>    
+                                    </Text>
                                 </TouchableOpacity> 
                                 <View style={styles.homeIndicator} /> 
                             </> ) : null } 
@@ -210,11 +247,6 @@ export const RegistrationScreen = ({ navigation }) => {
 }
 
 const styles = StyleSheet.create({
-    wrapper: {
-        flex: 1,
-        width: '100%',
-        backgroundColor: "#97c6f1",
-    },
     container: {
         flex: 1,
         width: '100%',
@@ -252,28 +284,17 @@ const styles = StyleSheet.create({
         borderRadius: 16,
     },
     removeAvatarIcon: {
-        // position: 'absolute',
         padding: 10,
         transform: [{ rotate: '45deg' }],
         right: 22.5,
         bottom: 4,
     },
     addAvatarIcon: {
-        // position: 'absolute',
         padding: 10,
         color: "#FF6C00",
         right: Platform.OS === 'ios' ? -97 : 22.5,
         bottom: 4,
-    },
-    homeIndicator: {
-        position: 'absolute',
-        height: 5,
-        width: 134,
-        alignSelf: 'center',
-        bottom: 6,
-        backgroundColor: '#212121',
-        borderRadius: 100,
-    },
+    },    
     title: {
         fontSize: 30,
         lineHeight: 35,
@@ -322,14 +343,20 @@ const styles = StyleSheet.create({
         lineHeight: 19,
         fontFamily: "Roboto-Regular",
     },
-    linkToLoginPage: {
-        alignSelf: 'center',
-    },
     linkToLoginPageText: {
         alignSelf: 'center',
         fontSize: 16,
         color: '#1B4371',
         lineHeight: 19,
         fontFamily: "Roboto-Regular",
+    },
+    homeIndicator: {
+        position: 'absolute',
+        height: 5,
+        width: 134,
+        alignSelf: 'center',
+        bottom: 6,
+        backgroundColor: '#212121',
+        borderRadius: 100,
     },
 })
