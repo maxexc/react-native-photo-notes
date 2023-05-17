@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
@@ -11,33 +10,12 @@ const Main = () => {
     const dispatch = useDispatch()
   
 
-    const routing = useRoute(stateChange)
-
-//   useEffect(() => {
-//     async function preloadFonts() {
-//       try {
-//         await Font.loadAsync(fonts);
-//         SplashScreen.hideAsync();
-//       } catch (error) {
-//         console.warn(error);
-//       } finally {
-//         setIsReady(true);
-//         SplashScreen.hideAsync();
-//       }
-//     }
-//     preloadFonts();
-//   }, []);
-  
-//    if (!isReady) {
-//     return null;
-//   }  
+    const routing = useRoute(stateChange) 
 
   return (
     <NavigationContainer>
-      {/* <View style={styles.container}> */}
         {routing}
         <StatusBar style="auto" />
-      {/* </View> */}
     </NavigationContainer>      
   );
 }

@@ -24,7 +24,7 @@ const MapScreen = ({ route }) => {
                 <Marker
                     coordinate={{ latitude: latitude, longitude: longitude }}
                     title='travel photo'
-                    description='location' 
+                    description='location'
                 />
             </MapView>
         </View>

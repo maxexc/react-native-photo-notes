@@ -13,6 +13,7 @@ const DefaultScreenPosts = ({ route, navigation }) => {
         }
     }, [route.params]);
     console.log('route.params', route.params);
+    // console.log('latitude', route.params.location.latitude);
     console.log('posts', posts);
 
     return (
@@ -38,8 +39,8 @@ const DefaultScreenPosts = ({ route, navigation }) => {
                                 >
                                     <Feather name="map-pin" style={styles.locationIcon} size={20} />
                                     <Text style={styles.locationText} >
-                                        Latitude: {route.params.location.latitude.toFixed(4)} {``}
-                                        Longitude: {route.params.location.longitude.toFixed(4)}
+                                        (Latitude: {route.params.location.latitude.toFixed(4)} {``}
+                                        Longitude: {route.params.location.longitude.toFixed(4)})
                                     </Text>
                                 </TouchableOpacity>
                             </View> 
@@ -48,10 +49,6 @@ const DefaultScreenPosts = ({ route, navigation }) => {
                     </View>                    
                 )}
             />  
-            {/* <View style={{ marginBottom: 10 }}>
-                <Button title='go to Map' onPress={() => navigation.navigate('Map')} />
-            </View>  
-                <Button title='go to Comments' onPress={() => navigation.navigate('Comments') } /> */}                      
         </View>
     );
 };

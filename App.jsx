@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 // import {LogBox} from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -9,7 +7,6 @@ import {useRoute} from './router';
 import { Provider } from 'react-redux';
 import Main from './components/main';
 import { store } from './redux/store';
-// import { useSelector } from 'react-redux';
 
 const fonts = {
   "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
@@ -21,9 +18,7 @@ const fonts = {
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
-  // LogBox.ignoreLogs(['Remote debugger']);
-  // const {stateChange} = useSelector((state) => state.auth) ;
-  
+  // LogBox.ignoreLogs(['Remote debugger']);  
   
 
   const routing = useRoute({})
@@ -50,13 +45,7 @@ export default function App() {
   return (
     <Provider store={store}>
       <Main />
-    </Provider>
-    // <NavigationContainer>
-    //   {/* <View style={styles.container}> */}
-    //     {routing}
-    //     <StatusBar style="auto" />
-    //   {/* </View> */}
-    // </NavigationContainer>      
+    </Provider> 
   );
 }
 

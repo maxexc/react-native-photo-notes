@@ -9,11 +9,10 @@ import PostsScreen from './screens/main/PostsScreen';
 import CreateScreen from './screens/main/CreatePostScreen';
 import ProfileScreen from './screens/main/ProfileScreen';
 
-// icons
 import { SimpleLineIcons } from '@expo/vector-icons'; 
 import { Feather } from '@expo/vector-icons'; 
 import { AntDesign } from '@expo/vector-icons';
-
+import { Button } from "react-native";
 
 
 const AuthStack = createStackNavigator();
@@ -43,7 +42,7 @@ export const useRoute = (isAuth, ) => {
     return (
         <>
             <MainTab.Navigator
-                style={{borderColor: '#fff',}}
+                style={{borderColor: '#fff'}}
                 initialRouteName="Posts"
                 name='Home'                
                 screenOptions={{
@@ -57,7 +56,7 @@ export const useRoute = (isAuth, ) => {
                     tabBarStyle: {
                         paddingTop: 9,
                         height: 83,
-                        paddingHorizontal: 20,                        
+                        paddingHorizontal: 20,                         
                         // width: 272,
                         // alignSelf: 'center',
                         // shadowColor: '#fff',
@@ -88,9 +87,25 @@ export const useRoute = (isAuth, ) => {
                 name='Profile'
                 component={ProfileScreen}
                 options={{
+                    // title: "ProfileScreen",
+                    // headerTitleStyle: {
+                    //     fontWeight: "bold",
+                    //     fontSize: 20,
+                    //     paddingHorizontal: 'auto',
+                    //     alignSelf: 'center',
+                    // },
+                    // headerStyle: {
+                    //     // backgroundColor: "#f4511e",    
+                    // },
                     tabBarIcon: ({ focused, size, color }) => (
                         <Feather name="user" size={24} color={color} />  
                     ),
+                    // headerLeft: () => (
+                    //     <Button
+                    //         onPress={() => alert("This is a button!")}
+                    //         title="Press me"
+                    //         color="#1d1c1c"
+                    //     />)
                 }}                
             />
         </MainTab.Navigator>
