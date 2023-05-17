@@ -13,7 +13,6 @@ const DefaultScreenPosts = ({ route, navigation }) => {
         }
     }, [route.params]);
     console.log('route.params', route.params);
-    // console.log('latitude', route.params.location.latitude);
     console.log('posts', posts);
 
     return (
@@ -35,12 +34,13 @@ const DefaultScreenPosts = ({ route, navigation }) => {
                                     activeOpacity={0.8}
                                     title='go to Map'
                                     style={styles.location}
-                                    onPress={() => navigation.navigate('Map', { location: item.location })}
+                                    onPress={() => navigation.navigate('Map', { location: item.location, geoaddress: item.geoaddress })}
                                 >
                                     <Feather name="map-pin" style={styles.locationIcon} size={20} />
                                     <Text style={styles.locationText} >
-                                        (Latitude: {route.params.location.latitude.toFixed(4)} {``}
-                                        Longitude: {route.params.location.longitude.toFixed(4)})
+                                        {route.params.geoaddress}
+                                        {/* (Latitude: {route.params.location.latitude.toFixed(4)} {``}
+                                        Longitude: {route.params.location.longitude.toFixed(4)}) */}
                                     </Text>
                                 </TouchableOpacity>
                             </View> 

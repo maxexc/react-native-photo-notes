@@ -21,7 +21,7 @@ const CreateScreen = ({ navigation }) => {
     
     const [isActiveBtn, setIsActiveBtn] = useState(false)
     const [photo, setPhoto] = useState('');
-    const [location, setLocation] = useState({latitude: -85, longitude: 0});
+    const [location, setLocation] = useState({latitude: -76, longitude: 22});
     const [title, setTitle] = useState("");
     const [geoaddress, setGeoaddress] = useState('')
     const [isKeyboardShown, setIsKeyboardShown] = useState(true);
@@ -130,7 +130,6 @@ const CreateScreen = ({ navigation }) => {
         setPhoto(
         "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/640px-HD_transparent_picture.png");
         // setTitle(null);
-        // setGeocode('');
         setGeoaddress('');
     }
 
@@ -160,7 +159,6 @@ const CreateScreen = ({ navigation }) => {
                 </View> 
             <View style={styles.container}>                               
                 <View style={styles.cameraOver} >
-                    {/* <TouchableWithoutFeedback onPress={ Keyboard.dismiss}> */}
                     <Camera style={styles.camera} ref={setCamera} type={cameraType} >
                         {photo && (
                         <View style={styles.takePhotoContainer}>
@@ -184,7 +182,6 @@ const CreateScreen = ({ navigation }) => {
                                 <MaterialIcons name="delete" size={24} color="black" />
                             </TouchableOpacity>)} 
                     </Camera>
-                    {/* </TouchableWithoutFeedback> */}
                 </View>               
                 <TextInput
                     keyboardType="default"
@@ -243,10 +240,6 @@ const CreateScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    // wrapper: {
-    //     flex: 1,
-    //     backgroundColor: '#fff',
-    // },
     container: {
         flex: 1,
         backgroundColor: '#fff',
