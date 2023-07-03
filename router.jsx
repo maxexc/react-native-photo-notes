@@ -87,8 +87,8 @@ export const useRoute = (isAuth) => {
                     component={ProfileScreen}  
                     options={
                         ({ route }) => ({
-                        tabBarStyle: ((route) => {
-                            const routeName = getFocusedRouteNameFromRoute(route) ?? "";
+                        tabBarStyle: ((Profile) => {
+                            const routeName = getFocusedRouteNameFromRoute(Profile) ?? "";
                             if (routeName === "Comments" || routeName === "Map") {
                                 return { display: "none" };
                             }
