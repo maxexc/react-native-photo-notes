@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import * as ScreenOrientation from "expo-screen-orientation";
 import {
     StyleSheet,
     View,
@@ -12,58 +11,33 @@ import {
     Platform,
     Keyboard,
     TouchableWithoutFeedback,
-    Dimensions,
 } from 'react-native';
-import { useDispatch } from 'react-redux';
-import { onStateChange } from '../../redux/auth/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { authSignInUser } from '../../redux/auth/authOperations';
+import { useDimantions } from '../../util/useDimentions';
+import { ActivityIndicator } from 'react-native';
+import { authSlice } from '../../redux/auth/authSlice';
+import { Toast } from 'toastify-react-native';
 
 
 const initialState = {
     email: '',
     password: '',
-}
+};
 
 export const LoginScreen = ({ navigation }) => {
-    const [state, setState] = useState(initialState)
+    const [state, setState] = useState(initialState);
     const [isKeyboardShown, setIsKeyboardShown] = useState(true);
     const [isSecureText, setIsSecureText] = useState(true);
     const [isActiveMail, setIsActiveMail] = useState(false);
     const [isActivePass, setIsActivePass] = useState(false);
+    const [isLoader, setIsLoader] = useState(false);
+    let { errorLogin } = useSelector((state) => state.auth);
 
-    const dispatch = useDispatch()
-    
-    // ----WARNING---- check orientation ----WARNING---- //    
-    const [orientation, setOrientation] = useState(null);
-
-    useEffect(() => {
-        checkOrientation();
-        const subscription = ScreenOrientation.addOrientationChangeListener(
-        handleOrientationChange
-        );
-        return () => {
-        ScreenOrientation.removeOrientationChangeListeners(subscription);
-        };
-    }, []);
-    const checkOrientation = async () => {
-        const orientation = await ScreenOrientation.getOrientationAsync();
-        setOrientation(orientation);
-    };
-    const handleOrientationChange = (e) => {
-        setOrientation(e.orientationInfo.orientation);
-    };
-    // console.log(orientation);    
-    
-    const [widthDimensions, setWidthDimensions] = useState();   
+    const dispatch = useDispatch();
+    const {orientation, currentDimentions} = useDimantions();
 
     useEffect(() => {
-        // ----WARNING---- check orientation ----WARNING---- //
-        
-        if (orientation !== 1) {
-            return setWidthDimensions((Dimensions.get('window').width) / 2);
-        } else setWidthDimensions((Dimensions.get('window').width) - 20 * 2);
-
-        // -------------------------------------------------- //
-
         const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
             setIsKeyboardShown(false);
         });
@@ -71,29 +45,53 @@ export const LoginScreen = ({ navigation }) => {
         const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
             setIsKeyboardShown(true);
         });
-        
+
+        checkMail();
         return () => {
             showSubscription.remove();
             hideSubscription.remove();
         };
-    }, [isKeyboardShown, orientation]);
+    }, [isKeyboardShown, orientation, errorLogin]);
+
+    const checkMail = () => {
+        if (errorLogin !== null) {
+            setIsLoader(false);
+            Toast.error('💭 Sorry, this user/pass         is NOT exist❗', 'center');
+            dispatch(authSlice.actions.setErrorLogin({ errorLogin: null }));
+        };
+    };    
 
     const handleSubmit = () => {
+        setIsLoader(true);
         Keyboard.dismiss();
-        // console.log(state);
-        console.log('email:', state.email, 'password:', state.password); 
-        dispatch(onStateChange())
-        // dispatch(authSignUpUser(state));
+        dispatch(authSignInUser(state));
         setState(initialState);
     };
 
+    const warring = () => {
+        Toast.warn('Input fields cann`t be empty 👀', 'center');
+    };
+    const warringEmail = () => {
+        Toast.warn('Please put "@" in          Email', 'center');
+    };
+    const warringPassword = () => {
+        Toast.warn('Password must be at least 6 symbols 💬 ', 'center');
+    };
+
     return (   
-        <TouchableWithoutFeedback onPress={ Keyboard.dismiss}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
                 <ImageBackground
                     source={require("../../assets/background.jpg")}
                     style={styles.background}
                 >
+                    {isLoader && (
+                        <ActivityIndicator
+                            style={styles.loader}
+                            size='large'
+                            color="#FF6C00"
+                        />
+                    )}
                     <KeyboardAvoidingView
                         behavior={Platform.OS === 'ios' ? 'padding' : ''}
                     >
@@ -101,8 +99,8 @@ export const LoginScreen = ({ navigation }) => {
                         <View
                             style={{
                                 ...styles.form,
-                                paddingBottom: isKeyboardShown ? 45 : 16,
-                                width: widthDimensions,
+                                paddingBottom: isKeyboardShown ? 40 : 16,
+                                width: currentDimentions,
                         }}>
                             {/* title & inputs */}
                             <Text style={styles.title}>Login</Text>
@@ -154,7 +152,21 @@ export const LoginScreen = ({ navigation }) => {
                                 <TouchableOpacity
                                     activeOpacity={0.8}
                                     style={styles.submitBtn}
-                                    onPress={handleSubmit}
+                                    onPress={() => {
+                                        if ((state.email.trim() === "") && (state.password.trim()) === "") {
+                                            warring();
+                                            return;
+                                        } if (state.email.indexOf('@') === -1) {
+                                            warringEmail();
+                                            return;
+                                        } if (state.password.length < 6) {
+                                            warringPassword();
+                                            return;
+                                        } else {
+                                            handleSubmit()
+                                            return;
+                                        }
+                                    }}
                                 >
                                         <Text style={styles.submitBtnText}>SIGN IN</Text>
                                 </TouchableOpacity>
@@ -162,12 +174,12 @@ export const LoginScreen = ({ navigation }) => {
                                 <TouchableOpacity  
                                     activeOpacity={0.6} 
                                     onPress={() => navigation.navigate('Registration')}
+                                    style={{ paddingVertical: 5 }}
                                 >
                                     <Text style={styles.linkToLoginPageText}>Don't have an account?
                                         <Text style={{ fontFamily: 'Roboto-Bold' }}> Sign up</Text>
                                     </Text>
                                 </TouchableOpacity> 
-                                <View style={styles.homeIndicator} /> 
                             </> ) : null } 
                         
                         </View>
@@ -190,6 +202,13 @@ const styles = StyleSheet.create({
         width: '100%',
         justifyContent: 'flex-end', 
         alignItems: 'center',
+    },
+    loader: {
+        position: "absolute",
+        bottom: "42%",
+        right: '45%',
+        zIndex: 1,
+        transform: [{ scaleX: 2 }, { scaleY: 2 }],
     },
     form: {   
         position: 'relative',
@@ -225,6 +244,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: 50 / 2 / 2,
         right: 16,
+        paddingVertical: 3,
     },
     showPassText: {        
         fontSize: 16,
@@ -234,7 +254,7 @@ const styles = StyleSheet.create({
     },
     submitBtn: {
         marginTop: 27,
-        marginBottom: 16,
+        marginBottom: 11,
         height: 51,
         backgroundColor: '#FF6C00',
         borderRadius: 100,
@@ -253,14 +273,5 @@ const styles = StyleSheet.create({
         color: '#1B4371',
         lineHeight: 19,
         fontFamily: "Roboto-Regular",
-    },   
-    homeIndicator: {
-        position: 'absolute',
-        height: 5,
-        width: 134,
-        alignSelf: 'center',
-        bottom: 6,
-        backgroundColor: '#212121',
-        borderRadius: 100,
-    },
+    },  
 })

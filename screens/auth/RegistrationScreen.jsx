@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import * as ScreenOrientation from "expo-screen-orientation";
-import * as ImagePicker from 'expo-image-picker';
 import {
     StyleSheet,
     View,
@@ -13,68 +11,42 @@ import {
     Platform,
     Keyboard,
     TouchableWithoutFeedback,
-    Dimensions,
     Image,
+    ActivityIndicator,
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import { onStateChange } from '../../redux/auth/authSlice';
-import { useDispatch } from 'react-redux';
-
-// console.log(ScreenOrientation);
-
+import { useDispatch, useSelector } from 'react-redux';
+import { authSignUpUser } from '../../redux/auth/authOperations';
+import { authSlice } from '../../redux/auth/authSlice';
+import { uploadAvatarToServer } from '../../firebase/serverAPI';
+import { useDimantions } from '../../util/useDimentions';
+import { pickImage } from '../../util/pickImage';
+import { Toast } from 'toastify-react-native';
 
 const initialState = {
-    avatar: null,
-    login: '',
+    userPhoto: null,
+    nickName: '',
     email: '',
     password: '',
 }
 
 export const RegistrationScreen = ({ navigation }) => {
-    // console.log('navigation:', navigation);
-    // console.log(Platform.OS);
-    const [state, setState] = useState(initialState)
+    const [state, setState] = useState(initialState);
     const [isKeyboardShown, setIsKeyboardShown] = useState(true);
     const [isSecureText, setIsSecureText] = useState(true);
     const [isActiveLogin, setIsActiveLogin] = useState(false);
     const [isActiveMail, setIsActiveMail] = useState(false);
     const [isActivePass, setIsActivePass] = useState(false);
     const [avatar, setAvatar] = useState(null);
+    const [userPhoto, setUserPhoto] = useState();
+    const [isLoader, setIsLoader] = useState(false);
+    let { errorSignIn } = useSelector((state) => state.auth);
+    // console.log(Platform.OS);        
 
     const dispatch = useDispatch();
-   
-    // ----WARNING---- check orientation ----WARNING---- //    
-    const [orientation, setOrientation] = useState(null);
+    const {orientation, currentDimentions} = useDimantions();
 
     useEffect(() => {
-        checkOrientation();    
-        const subscription = ScreenOrientation.addOrientationChangeListener(
-        handleOrientationChange
-        );
-        return () => {
-        ScreenOrientation.removeOrientationChangeListeners(subscription);
-        };        
-    }, []);
-    const checkOrientation = async () => {
-        const orientation = await ScreenOrientation.getOrientationAsync();
-        setOrientation(orientation);
-    };    
-    const handleOrientationChange = (e) => {
-        setOrientation(e.orientationInfo.orientation);
-    };    
-    // console.log(orientation); 
-
-    const [widthDimensions, setWidthDimensions] = useState();   
-
-    useEffect(() => {
-        // ----WARNING---- check orientation ----WARNING---- //
-        
-         if (orientation !== 1) {
-            return setWidthDimensions((Dimensions.get('window').width )/ 2)
-        } else setWidthDimensions((Dimensions.get('window').width) - 20 * 2)
-
-        // -------------------------------------------------- //
-
         const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
             setIsKeyboardShown(false);
         });
@@ -82,193 +54,233 @@ export const RegistrationScreen = ({ navigation }) => {
         const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
             setIsKeyboardShown(true);
         });
-        
+
+        checkUser();
         return () => {
             showSubscription.remove();
             hideSubscription.remove();
         };
-    }, [isKeyboardShown, orientation]);
+    }, [isKeyboardShown, orientation, userPhoto, avatar, errorSignIn]);
 
-    const handleSubmit = () => {    
-        Keyboard.dismiss();
-        // console.log(state);
-        console.log('login:', state.login, 'email:', state.email, 'password:', state.password);
-        dispatch(onStateChange())
-        // dispatch(authSignUpUser(state));
-        setState(initialState);
+    const checkUser = () => {
+        if (errorSignIn !== null) {
+            setIsLoader(false);
+            Toast.error(`💭 Sorry, this E-mail already exists 🙄`, 'center');
+            dispatch(authSlice.actions.setErrorSignIn({ errorSignIn: null }));
+        };
     };
 
-    const pickImage = async () => {
-        // No permissions request is necessary for launching the image library
-        let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-        });
+    const handleSubmit = async () => {    
+        try {
+            setIsLoader(true);
+            Keyboard.dismiss();       
 
-        if (!result.canceled) {
-        setAvatar(result.assets[0].uri);
-        console.log(avatar);
-        }
+            const userPhoto = avatar ? await uploadAvatarToServer(avatar) : null;
+            setUserPhoto(userPhoto);
+       
+            dispatch(authSignUpUser({ ...state, userPhoto }));
+            
+        } catch (error) {
+            if (error.message !== null) { setIsLoader(false) };
+            console.log(error);
+        };
+    };
+    
+    const handlePickImage = async () => {
+        const resultPickImages = await pickImage();
+        await setAvatar(resultPickImages);
+    };
+
+    const warring = () => {
+        Toast.warn('Input fields cann`t be empty 👀', 'center');
+    };
+    const warringEmail = () => {
+        Toast.warn('Please put "@" in          Email', 'center');
+    };
+    const warringPassword = () => {
+        Toast.warn('Password must be at least 6 symbols 💬 ', 'center');
     };
 
     return (   
-        <TouchableWithoutFeedback onPress={ Keyboard.dismiss}>
-            <View style={styles.container}>
-                <ImageBackground
-                    source={require("../../assets/background.jpg")}
-                    style={styles.background}                      
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <ImageBackground
+                source={require("../../assets/background.jpg")}
+            style={styles.background}>                
+                {isLoader && (
+                    <ActivityIndicator
+                        style={styles.loader}
+                        size='large'
+                        color="#FF6C00"
+                    />
+                )}     
+                
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : ''}
                 >
-                    <KeyboardAvoidingView
-                        behavior={Platform.OS === 'ios' ? 'padding' : ''}
-                    >
-                        {/* main form */}
-                        <View
-                            style={{
-                                ...styles.form,
-                                paddingBottom: isKeyboardShown ? 42 : 16,
-                                width: widthDimensions,
-                        }}>
-                        
-                        {/* avatar   button add/delete avatar */}
-                            <View style={styles.avatar}>
-                                {Platform.OS === 'ios' ? 
-                                    avatar && (<Image source={{ cache: 'only-if-cached', uri: avatar }} style={styles.avatarImg} />) :
-                                    <Image source={{ cache: 'only-if-cached', uri: avatar }} style={styles.avatarImg} />}
-                                {avatar ? (
-                                        <TouchableOpacity activeOpacity={0.5} onPress={() => {setAvatar(null); }} >
-                                            <View style={styles.removeAvatarIcon}>
-                                                <View style={{ backgroundColor: '#fff', borderRadius: 50, }}>
-                                                    <AntDesign style={{ transform: [{ rotate: '45deg' }] }} name="closecircleo" color="#BDBDBD" size={25} />                                                    
-                                                </View>
-                                            </View>
-                                        </TouchableOpacity>
-                                        ) : (
-                                        <TouchableOpacity activeOpacity={0.5} onPress={pickImage}>
-                                            <View style={styles.addAvatarIcon}>
-                                                <View style={{ backgroundColor: '#fff', borderRadius: 50, }}>
-                                                    <AntDesign name="pluscircleo" color="#FF6C00" size={25} />
-                                                </View>
-                                            </View>
-                                        </TouchableOpacity>
-                                )}                                
-                            </View>                            
+                    {/* main form */}
+                    <View
+                        style={{
+                            ...styles.form,
+                            paddingBottom: isKeyboardShown ? 37 : 16,
+                            width: currentDimentions,
+                    }}>
+                    
+                    {/* avatar   button add/delete avatar */}
+                        <View style={styles.avatar}>
+                            {avatar !== null?
+                                (<Image style={styles.avatarImg} source={{ uri: avatar }} />) :
+                                (<Image style={styles.avatarImg} source={ require('../../assets/defaultAva.png')} />)}
 
-                            {/* title & inputs */}
-
-                            <Text style={styles.title}>Registration</Text>
-                            <TextInput
-                                keyboardType="default"
-                                autoComplete="name"
-                                style={{
-                                    ...styles.input,
-                                    borderColor: isActiveLogin ? "#FF6C00" : "#E8E8E8",
-                                    backgroundColor: isActiveLogin ? "#FFFFFF" : "#F6F6F6",
-                                }}
-                                onFocus={() => setIsActiveLogin(true)}
-                                onBlur={() => setIsActiveLogin(false)}
-                                placeholder='Login'
-                                placeholderTextColor='#BDBDBD'
-                                value={state.login}
-                                onChangeText={(value) => setState((prevState) => ({...prevState, login: value}))}
-                            />
-                            <TextInput
-                                keyboardType="email-address"
-                                autoComplete="email"
-                                style={{
-                                    ...styles.input,
-                                    borderColor: isActiveMail ? "#FF6C00" : "#E8E8E8",
-                                    backgroundColor: isActiveMail ? "#FFFFFF" : "#F6F6F6",
-                                }}
-                                onFocus={() => setIsActiveMail(true)}
-                                onBlur={() => setIsActiveMail(false)}
-                                placeholder='Email'
-                                placeholderTextColor='#BDBDBD'
-                                value={state.email}
-                                onChangeText={(value) => setState((prevState) => ({...prevState, email: value}))}
-                            />
-                            
-                            {/* show / hide password */}
-                            <View style={{position: 'relative'}}>
-                                <TextInput  
-                                    keyboardType="default"  
-                                    style={{
-                                    ...styles.input,
-                                    borderColor: isActivePass ? "#FF6C00" : "#E8E8E8",
-                                    backgroundColor: isActivePass ? "#FFFFFF" : "#F6F6F6",
-                                    }} 
-                                    onFocus={() => setIsActivePass(true)}
-                                    onBlur={() => setIsActivePass(false)}
-                                    placeholder='Password'
-                                    placeholderTextColor='#BDBDBD'
-                                    value={state.password}
-                                    onChangeText={(value) => setState((prevState) => ({...prevState, password: value}))}
-                                    secureTextEntry={isSecureText}
-                                />
-                                <Pressable 
-                                    onPress={() => setIsSecureText(prevState => !prevState)}
-                                    style={styles.showPass} 
-                                >
-                                    <Text style={styles.showPassText} >
-                                        {isSecureText ? 'Show' : 'Hide'}
-                                    </Text>                                        
-                                </Pressable>
-                            </View>
-                                
-                        {/* registration button    link to LoginPage*/}                        
-                        {isKeyboardShown ? ( 
-                            <> 
-                                <TouchableOpacity
-                                    activeOpacity={0.8}
-                                    style={styles.submitBtn}
-                                    onPress={handleSubmit}
-                                >
-                                        <Text style={styles.submitBtnText}>SIGN UP</Text>
+                            {avatar !== null ? (
+                                <TouchableOpacity activeOpacity={0.5} style={styles.removeAvatarIcon} onPress={() => {setAvatar(null)}} >
+                                    <View>
+                                        <View style={{ backgroundColor: '#fff', borderRadius: 50, }}>
+                                            <AntDesign style={{ transform: [{ rotate: '45deg' }] }} name="closecircleo" color="#BDBDBD" size={25} />                                                    
+                                        </View>
+                                    </View>
                                 </TouchableOpacity>
-                                
-                                <TouchableOpacity  
-                                    activeOpacity={0.6}
-                                    onPress={() => navigation.navigate('Login')}
-                                >
-                                    <Text style={styles.linkToLoginPageText}>Already have an account, 
-                                        <Text style={{ fontFamily: 'Roboto-Bold'}}> Log in</Text>    
-                                    </Text>
-                                </TouchableOpacity> 
-                                <View style={styles.homeIndicator} /> 
-                            </> ) : null } 
-                        
+                                ) : (
+                                <TouchableOpacity activeOpacity={0.5} style={styles.addAvatarIcon} onPress={handlePickImage}>
+                                    <View>
+                                        <View style={{ backgroundColor: '#fff', borderRadius: 50, }}>
+                                            <AntDesign name="pluscircleo" color="#FF6C00" size={25} />
+                                        </View>
+                                    </View>
+                                </TouchableOpacity>
+                            )}                                
                         </View>
-                    </KeyboardAvoidingView>                               
-                </ImageBackground>                                     
-            </View>
+
+                        {/* title & inputs */}
+                        <Text style={styles.title}>Registration</Text>
+                        <TextInput
+                            keyboardType="default"
+                            autoComplete="name"
+                            style={{
+                                ...styles.input,
+                                borderColor: isActiveLogin ? "#FF6C00" : "#E8E8E8",
+                                backgroundColor: isActiveLogin ? "#FFFFFF" : "#F6F6F6",
+                            }}
+                            onFocus={() => setIsActiveLogin(true)}
+                            onBlur={() => setIsActiveLogin(false)}
+                            placeholder='nickName'
+                            placeholderTextColor='#BDBDBD'
+                            value={state.nickName}
+                            onChangeText={(value) => setState((prevState) => ({...prevState, nickName: value}))}
+                        />
+                        <TextInput
+                            keyboardType="email-address"
+                            autoComplete="email"
+                            required
+                            style={{
+                                ...styles.input,
+                                borderColor: isActiveMail ? "#FF6C00" : "#E8E8E8",
+                                backgroundColor: isActiveMail ? "#FFFFFF" : "#F6F6F6",
+                            }}
+                            onFocus={() => setIsActiveMail(true)}
+                            onBlur={() => setIsActiveMail(false)}
+                            placeholder='Email'
+                            placeholderTextColor='#BDBDBD'
+                            value={state.email}
+                            onChangeText={(value) => setState((prevState) => ({...prevState, email: value}))}
+                        />
+                        
+                        {/* show / hide password */}
+                        <View style={{position: 'relative'}}>
+                            <TextInput  
+                                keyboardType="default"  
+                                style={{
+                                ...styles.input,
+                                borderColor: isActivePass ? "#FF6C00" : "#E8E8E8",
+                                backgroundColor: isActivePass ? "#FFFFFF" : "#F6F6F6",
+                                }} 
+                                onFocus={() => setIsActivePass(true)}
+                                onBlur={() => setIsActivePass(false)}
+                                placeholder='Password'
+                                placeholderTextColor='#BDBDBD'
+                                value={state.password}
+                                onChangeText={(value) => setState((prevState) => ({...prevState, password: value}))}
+                                secureTextEntry={isSecureText}
+                            />
+                            <Pressable
+                                onPress={() => setIsSecureText(prevState => !prevState)}                                
+                                style={styles.showPass} 
+                            >
+                                <Text style={styles.showPassText} >
+                                    {isSecureText ? 'Show' : 'Hide'}
+                                </Text>                                        
+                            </Pressable>
+                        </View>
+                            
+                    {/* registration button    link to LoginPage*/}                        
+                    {isKeyboardShown ? ( 
+                        <> 
+                            <TouchableOpacity
+                                activeOpacity={0.8}
+                                style={styles.submitBtn}
+                                onPress={() => {
+                                    if ((state.nickName.trim() === "") && (state
+                                        .email.trim() === "") && (state.password.trim()) === "") {
+                                        warring();
+                                        return;
+                                    } if (state.email.indexOf('@') === -1) {
+                                        warringEmail();
+                                        return;
+                                    } if (state.password.length < 6) {
+                                        warringPassword();
+                                        return;
+                                    } else {
+                                        handleSubmit()
+                                        return;
+                                    }
+                                }}
+                            >
+                                    <Text style={styles.submitBtnText}>SIGN UP</Text>
+                            </TouchableOpacity>
+                            
+                            <TouchableOpacity  
+                                activeOpacity={0.6}
+                                onPress={() => navigation.navigate('Login')}
+                                style={{ paddingVertical: 5 }}
+                            >
+                                <Text style={styles.linkToLoginPageText}>Already have an account, 
+                                    <Text style={{ fontFamily: 'Roboto-Bold'}}> Log in</Text>    
+                                </Text>
+                            </TouchableOpacity> 
+                            <View style={styles.homeIndicator} /> 
+                        </> ) : null }             
+                                    
+                    </View>
+                </KeyboardAvoidingView>                               
+            </ImageBackground>  
         </TouchableWithoutFeedback>          
     )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        width: '100%',
-        justifyContent: "flex-end",        
-    },
     background: {
         flex: 1,
         resizeMode: 'cover',
         width: '100%',
-        justifyContent: 'flex-end', 
+        justifyContent: 'flex-end',
         alignItems: 'center',
     },
-    form: {   
+    loader: {
+        position: "absolute",
+        bottom: "42%",
+        right: '45%',
+        zIndex: 1,
+        transform: [{ scaleX: 2 }, { scaleY: 2 }],
+    },
+    form: {
         position: 'relative',
         backgroundColor: '#fff',
         width: '100%',
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
-        paddingHorizontal: 16,  
+        paddingHorizontal: 16,
     },
     avatar: {
-        position: 'absolute',
+        position: 'relative',
         flexDirection: 'row',
         alignItems: 'flex-end',
         width: 120,
@@ -284,22 +296,25 @@ const styles = StyleSheet.create({
         borderRadius: 16,
     },
     removeAvatarIcon: {
+        position: 'absolute',
         padding: 10,
         transform: [{ rotate: '45deg' }],
-        right: 22.5,
+        right: -22.5,
         bottom: 4,
     },
     addAvatarIcon: {
+        position: 'absolute',
         padding: 10,
         color: "#FF6C00",
-        right: Platform.OS === 'ios' ? -97 : 22.5,
+        right: -22.5,
+        // right: Platform.OS === 'ios' ? -97 : 22.5,
         bottom: 4,
-    },    
+    },
     title: {
         fontSize: 30,
         lineHeight: 35,
         letterSpacing: 0.72,
-        marginTop: 82,
+        marginTop: 20,
         marginBottom: 22,
         textAlign: 'center',
         color: '#212121',
@@ -316,13 +331,14 @@ const styles = StyleSheet.create({
         fontSize: 16,
         lineHeight: 19,
         fontFamily: "Roboto-Regular",
-    },   
+    },
     showPass: {
         position: "absolute",
         top: 50 / 2 / 2,
         right: 16,
+        paddingVertical: 3,
     },
-    showPassText: {        
+    showPassText: {
         fontSize: 16,
         color: '#1B4371',
         lineHeight: 19,
@@ -330,7 +346,7 @@ const styles = StyleSheet.create({
     },
     submitBtn: {
         marginTop: 27,
-        marginBottom: 16,
+        marginBottom: 11,
         height: 51,
         backgroundColor: '#FF6C00',
         borderRadius: 100,
@@ -350,13 +366,4 @@ const styles = StyleSheet.create({
         lineHeight: 19,
         fontFamily: "Roboto-Regular",
     },
-    homeIndicator: {
-        position: 'absolute',
-        height: 5,
-        width: 134,
-        alignSelf: 'center',
-        bottom: 6,
-        backgroundColor: '#212121',
-        borderRadius: 100,
-    },
-})
+});

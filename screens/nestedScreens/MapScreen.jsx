@@ -3,9 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 const MapScreen = ({ route }) => {
-    console.log( 'route.params.location', route.params.location);
     const { latitude, longitude } = route.params.location; 
-    const coords = `${ latitude } ${longitude}`
+    const coords = `${latitude} ${longitude}`;
 
     return (
         <View style={styles.container}>
@@ -40,6 +39,6 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: '#cfcfcf8f',
     }
-})
+});
 
 export default MapScreen;
