@@ -52,7 +52,7 @@ const CreateScreen = ({ navigation }) => {
             }
         }
         getPermissions();    
-    }, [photo, geoaddress]);
+    }, [photo]);
     
     if (!cameraPermission) {
         // Camera permissions are still loading
