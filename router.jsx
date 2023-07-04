@@ -88,7 +88,7 @@ export const useRoute = (isAuth) => {
                     options={
                         ({ route }) => ({
                         tabBarStyle: ((Profile) => {
-                            const routeName = getFocusedRouteNameFromRoute(Profile) ?? "";
+                            const routeName = getFocusedRouteNameFromRoute(Profile) ?? "Posts";
                             if (routeName === "Comments" || routeName === "Map") {
                                 return { display: "none" };
                             }
