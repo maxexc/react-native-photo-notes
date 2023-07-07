@@ -38,7 +38,7 @@ const CommentsScreen = ({ route }) => {
     
     const createComment = async ( ) => {
         if (comment === "") {
-            Toast.warn(`To create a comment,   the field must be filled. 🗯`, 'center' );
+            Toast.warn(`To create a comment, \nthe field must be filled. 🗯`, 'center' );
             return;
         }
         const params = {

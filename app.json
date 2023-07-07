@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "react-native-project",
-    "slug": "react-native-project",
+    "name": "Photo notes",
+    "slug": "react-native-photo-notes",
+    "description": "This is an excellent app for photo notes, based real-time data.",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",

@@ -95,7 +95,7 @@ export const RegistrationScreen = ({ navigation }) => {
         Toast.warn('Input fields cann`t be empty 👀', 'center');
     };
     const warringEmail = () => {
-        Toast.warn('Please put "@" in          Email', 'center');
+        Toast.warn('Please put "@" in \nEmail', 'center');
     };
     const warringPassword = () => {
         Toast.warn('Password must be at least 6 symbols 💬 ', 'center');

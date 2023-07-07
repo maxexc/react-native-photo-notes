@@ -56,7 +56,7 @@ export const LoginScreen = ({ navigation }) => {
     const checkMail = () => {
         if (errorLogin !== null) {
             setIsLoader(false);
-            Toast.error('💭 Sorry, this user/pass         is NOT exist❗', 'center');
+            Toast.error('💭 Sorry, this user/pass \nis NOT exist❗', 'center');
             dispatch(authSlice.actions.setErrorLogin({ errorLogin: null }));
         };
     };    
@@ -72,7 +72,7 @@ export const LoginScreen = ({ navigation }) => {
         Toast.warn('Input fields cann`t be empty 👀', 'center');
     };
     const warringEmail = () => {
-        Toast.warn('Please put "@" in          Email', 'center');
+        Toast.warn('Please put "@" in \nEmail', 'center');
     };
     const warringPassword = () => {
         Toast.warn('Password must be at least 6 symbols 💬 ', 'center');

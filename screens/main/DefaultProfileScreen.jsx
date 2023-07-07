@@ -18,7 +18,7 @@ const DefaultProfileScreen = ({ navigation }) => {
     const dispatch = useDispatch();
 
     const signOut = () => {
-        Toast.success(`You are logged off       now❕ `, 'center',);
+        Toast.success(`You are logged off \nnow❕ `, 'center',);
         dispatch(authSignOutUser());        
     };    
 
@@ -51,7 +51,7 @@ const DefaultProfileScreen = ({ navigation }) => {
         await deletePostFromServer(id);
         deletePostImageFromServer(photoName);
 
-        Toast.success(`Post "${title}" was       DELETED! ✔`, 'top',);
+        Toast.success(`Post "${title}" was \nDELETED! ✔`, 'top',);
     };
     
     const handlePickImage = async () => {

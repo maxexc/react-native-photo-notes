@@ -5,8 +5,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { Provider } from 'react-redux';
 import Main from './components/main';
 import { store } from './redux/store';
-import { View } from 'react-native';
-import ToastManager from 'toastify-react-native'
 
 const fonts = {
   "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
