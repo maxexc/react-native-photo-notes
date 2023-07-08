@@ -3,7 +3,7 @@
 To use this app 😊 download "Expo Go" on your mobile device from App.store or Play Store,
 
 for iOS(iPhone):
-install the local repository, run from terminal: "npm start" after
+install the local repository(run from terminal: "npm i"), then run from terminal: "npm start" after
 open Camera and scan QR-code, then push links ✔,
 
 for Android:
