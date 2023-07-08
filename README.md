@@ -12,4 +12,4 @@ https://expo.dev/@max.exc7/react-native-photo-notes
 ✔.
 or scan QR-code here:
 
-![QR-code for Andriod](https://github.com/maxexc/react-native-photo-notes/blob/main/QR_code_android.jpg)
+![QR-code for Andriod](https://github.com/maxexc/react-native-photo-notes/blob/main/assets/QR_code_android.jpg)
