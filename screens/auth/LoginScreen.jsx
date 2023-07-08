@@ -69,7 +69,7 @@ export const LoginScreen = ({ navigation }) => {
     };
 
     const warring = () => {
-        Toast.warn('Input fields cann`t be empty 👀', 'center');
+        Toast.warn('Input fields cann`t be \nempty 👀', 'center');
     };
     const warringEmail = () => {
         Toast.warn('Please put "@" in \nEmail', 'center');
