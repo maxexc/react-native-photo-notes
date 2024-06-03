@@ -11,7 +11,8 @@
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/e932c4c6-71a2-4446-bf38-cf4ef943479b"
     },
     "plugins": [
       [
@@ -49,6 +50,10 @@
       "eas": {
         "projectId": "e932c4c6-71a2-4446-bf38-cf4ef943479b"
       }
-    }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "owner": "max.exc7"
   }
 }
