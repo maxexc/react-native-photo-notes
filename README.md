@@ -22,3 +22,4 @@ or scan QR-code here:
 ![QR-code for Android](https://github.com/maxexc/react-native-photo-notes/blob/main/assets/Update_SDK48.jpg)
 
 Full link: ( https://expo.dev/preview/update?message=Merge%20pull%20request%20%231%20from%20maxexc%2Fversion-1.2.0%0A%0Aupdate&updateRuntimeVersion=exposdk%3A48.0.0&createdAt=2024-06-03T03%3A54%3A26.912Z&slug=exp&projectId=e932c4c6-71a2-4446-bf38-cf4ef943479b&group=93ae074d-8c0c-4538-8a27-095b11157a46 )
+
